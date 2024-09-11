@@ -1,6 +1,6 @@
 {
     "name": "np-platform-client",
-    "version": "0.18.1",
+    "version": "0.18.27",
     "license": "Apache-2.0",
     "scripts": {
         "demo": "expo start --web",
@@ -28,18 +28,18 @@
     "jest": {
         "preset": "jest-expo",
         "testPathIgnorePatterns": [
-        "/node_modules/",
-        "/dist/"
+            "/node_modules/",
+            "/dist/"
         ],
         "modulePathIgnorePatterns": [
-        "/dist/"
+            "/dist/"
         ],
         "testEnvironment": "jsdom",
         "moduleNameMapper": {
-        "^react-native$": "react-native-web"
+            "^react-native$": "react-native-web"
         },
         "setupFilesAfterEnv": [
-        "./util/setuptests.js"
+            "./util/setuptests.js"
         ]
     },
     "peerDependencies": {
