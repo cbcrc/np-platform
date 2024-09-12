@@ -98,12 +98,20 @@ export const personaZ = {
     hue: 250
 }
 
+export const personaJournalistA = {
+    key: 'journalistA',
+    name: 'zipedeedoodah',
+    hue: 250,
+    tag: "journalist",
+    badge: "https://images.radio-canada.ca/q_auto,w_1200/v1/ici-info/perso/logo-papillon-radio-canada.jpg'",
+    organization: "CBC/RADIO-CANADA"
+}
 
 export const defaultPersona = 'a';
 
 export const defaultPersonaList = [personaA, personaB, personaC, personaD, personaE, personaF,
     personaG, personaH, personaI, personaJ, personaK, personaL,
-    personaX, personaY, personaZ
+    personaX, personaY, personaZ, personaJournalistA
 ];
 
 

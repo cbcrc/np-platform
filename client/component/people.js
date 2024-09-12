@@ -24,11 +24,11 @@ export function ProfilePhoto({userId, type='large', photo=null, faint=false, che
         const face = persona?.face;
         if (face || photo || persona?.photoUrl) {
             return <FaceImage face={face} photoUrl={photo ?? persona?.photoUrl} type={type} 
-                border={border} faint={faint} check={check} />
+                border={border} faint={faint} check={check} badge={badge}/>
         } else if (persona?.hue && persona?.name) {
             return <LetterFace name={persona.name} hue={persona.hue} type={type} />
         } else {
-            return <AnonymousFace faint={faint} type={type} border={border} />    
+            return <AnonymousFace faint={faint} type={type} border={border} badge={badge}/>    
         }
     }
 }
@@ -142,7 +142,7 @@ const FacePileStyle = StyleSheet.create({
     }
 })
 
-export function Byline({type='small', photoType=null, clickable=true, userId, name=null, photo=null, time, subtitleLabel, subtitleParams={}, underline=false, edited=false, badge=null, tag=null}) {
+export function Byline({type='small', photoType=null, clickable=true, userId, name=null, photo=null, time, subtitleLabel, subtitleParams={}, underline=false, edited=false}) {
     const s = BylineStyle
     const persona = usePersonaObject(userId);
     const language = useLanguage();
@@ -150,16 +150,16 @@ export function Byline({type='small', photoType=null, clickable=true, userId, na
     function onProfile() {
         datastore.gotoInstance({structureKey: 'profile', instanceKey: userId});
     }
-    if (badge && tag) { // titled writer layout
+    if (persona.badge && persona.tag) { // titled writer layout
         return <View style={s.outer}>
-            <ProfilePhoto userId={userId} photo={photo} type={'large'} badge={badge} />
+            <ProfilePhoto userId={userId} photo={photo} type={'large'} badge={persona.badge} />
              <Pad size={spacings.xs} />
              <View style={{ flexDirection: 'column' }}>
                 <View style={{ flexDirection: 'row' }}>
                     {clickable ?
-                        <TextButton type='small' strong text={name} underline={underline} onPress={onProfile} />
+                        <TextButton type='small' strong text={name ?? persona?.name}  underline={underline} onPress={onProfile} />
                     : 
-                        <UtilityText strong text={name} underline={underline} />
+                        <UtilityText strong text={name ?? persona?.name}  underline={underline} />
                     }
                     {time && <Pad size={6} />}
                     {time &&                     <UtilityText color={colorTextGrey} 
@@ -167,8 +167,8 @@ export function Byline({type='small', photoType=null, clickable=true, userId, na
                                 formatParams={{time: formatMiniDate(time, language)}} underline={underline}/>
                     }
                 </View>
-                {tag && <View style={s.tag}>
-                     <UtilityText label={tag} type='tiny' />
+                {persona.tag && <View style={s.tag}>
+                     <UtilityText label={persona.tag} type='tiny' />
                 </View>
                 }
         </View>
