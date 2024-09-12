@@ -8,16 +8,11 @@ import { colorBlack, colorDisabledBackground, colorTextGrey, colorWhite, colorPi
 import { TextButton } from "./button";
 import { useLanguage } from "./translation";
 
-// export function ProfilePhoto({userId, type='large', photo=null, faint=false, check=false, border=false, badge=null}) {
-//     return <FaceImage face={photo} photoUrl={photo} type={type} 
-//                 border={border} faint={faint} check={check} badge={badge} />
-// }
 export function ProfilePhoto({userId, type='large', photo=null, faint=false, check=false, border=false, badge=null}) {
 
     const persona = useObject('persona', userId);
     const isLive = useIsLive();
     const meKey = usePersonaKey();
-
     if (meKey == userId && isLive) {
         return <MyProfilePhoto type={type} photo={photo} faint={faint} check={check} border={border} badge={badge} />
     } else {
@@ -28,7 +23,7 @@ export function ProfilePhoto({userId, type='large', photo=null, faint=false, che
         } else if (persona?.hue && persona?.name) {
             return <LetterFace name={persona.name} hue={persona.hue} type={type} />
         } else {
-            return <AnonymousFace faint={faint} type={type} border={border} badge={badge}/>    
+            return <AnonymousFace faint={faint} type={type} border={border}/>    
         }
     }
 }

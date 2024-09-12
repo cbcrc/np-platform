@@ -100,10 +100,11 @@ export const personaZ = {
 
 export const personaJournalistA = {
     key: 'journalistA',
-    name: 'zipedeedoodah',
+    name: 'Emeka Eze',
     hue: 250,
     tag: "journalist",
-    badge: "https://images.radio-canada.ca/q_auto,w_1200/v1/ici-info/perso/logo-papillon-radio-canada.jpg'",
+    photoUrl: faceUrl('face4.jpeg'),
+    badge: "https://images.radio-canada.ca/q_auto,w_1200/v1/ici-info/perso/logo-papillon-radio-canada.jpg",
     organization: "CBC/RADIO-CANADA"
 }
 
@@ -113,7 +114,6 @@ export const defaultPersonaList = [personaA, personaB, personaC, personaD, perso
     personaG, personaH, personaI, personaJ, personaK, personaL,
     personaX, personaY, personaZ, personaJournalistA
 ];
-
 
 export function personaListToMap(personas) {
     const result = {};
