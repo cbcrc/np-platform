@@ -29,7 +29,7 @@ export function Comment({commentKey}) {
             <Catcher>
                 {commentAboveWidgets?.map((Widget,i) => <Widget key={i} comment={comment}/>)}
             </Catcher>
-            <Byline type='large' userId={comment.from} time={comment.time} edited={comment.edited} />
+            <Byline type='large' userId={comment.from} name={comment.from} time={comment.time} edited={comment.edited} badge={'https://images.radio-canada.ca/q_auto,w_1200/v1/ici-info/perso/logo-papillon-radio-canada.jpg'} tag={'journalist'} />
             <Pad size={20} />
             <PadBox left={48}>
                 <Catcher>

@@ -1,4 +1,4 @@
-import { useDatastore, usePersonaObject, usePersonaPreview as usePersonaPreview } from "../util/datastore";
+import { useDatastore, useIsLive, useObject, usePersonaKey, usePersonaObject, usePersonaPreview as usePersonaPreview } from "../util/datastore";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { IconCircleCheck } from "./icon";
 import { UtilityText } from "./text";
@@ -8,9 +8,29 @@ import { colorBlack, colorDisabledBackground, colorTextGrey, colorWhite, colorPi
 import { TextButton } from "./button";
 import { useLanguage } from "./translation";
 
+// export function ProfilePhoto({userId, type='large', photo=null, faint=false, check=false, border=false, badge=null}) {
+//     return <FaceImage face={photo} photoUrl={photo} type={type} 
+//                 border={border} faint={faint} check={check} badge={badge} />
+// }
 export function ProfilePhoto({userId, type='large', photo=null, faint=false, check=false, border=false, badge=null}) {
-    return <FaceImage face={photo} photoUrl={photo} type={type} 
-                border={border} faint={faint} check={check} badge={badge} />
+
+    const persona = useObject('persona', userId);
+    const isLive = useIsLive();
+    const meKey = usePersonaKey();
+
+    if (meKey == userId && isLive) {
+        return <MyProfilePhoto type={type} photo={photo} faint={faint} check={check} border={border} badge={badge} />
+    } else {
+        const face = persona?.face;
+        if (face || photo || persona?.photoUrl) {
+            return <FaceImage face={face} photoUrl={photo ?? persona?.photoUrl} type={type} 
+                border={border} faint={faint} check={check} />
+        } else if (persona?.hue && persona?.name) {
+            return <LetterFace name={persona.name} hue={persona.hue} type={type} />
+        } else {
+            return <AnonymousFace faint={faint} type={type} border={border} />    
+        }
+    }
 }
 
 export function MyProfilePhoto({type='large', photo=null, faint=false, check=false, border=false}) {
