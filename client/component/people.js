@@ -7,6 +7,7 @@ import { formatDate, formatMiniDate } from "./date";
 import { colorBlack, colorDisabledBackground, colorTextGrey, colorWhite, colorPink } from "./color";
 import { TextButton } from "./button";
 import { useLanguage } from "./translation";
+import { useConfig } from "../util/features";
 
 export function ProfilePhoto({userId, type='large', photo=null, faint=false, check=false, border=false, badge=null}) {
 
@@ -138,15 +139,21 @@ const FacePileStyle = StyleSheet.create({
 })
 
 export function Byline({type='small', photoType=null, clickable=true, userId, name=null, photo=null, time, subtitleLabel, subtitleParams={}, underline=false, edited=false}) {
-    const s = BylineStyle
+    
+    const {enableTitledWriterComment} = useConfig();
+    const s = BylineStyle;
     const persona = usePersonaObject(userId);
     const language = useLanguage();
     const datastore = useDatastore();
+
     function onProfile() {
         datastore.gotoInstance({structureKey: 'profile', instanceKey: userId});
     }
-    if (persona.badge && persona.tag) { // titled writer layout
-        return <View style={s.outer}>
+    if (enableTitledWriterComment && persona.badge && persona.tag) { // titled writer layout
+        if (Comment.titledWriterAnonymousComment)
+            return <View style={s.outer}>anonymous</View>
+        else 
+            return <View style={s.outer}>
             <ProfilePhoto userId={userId} photo={photo} type={'large'} badge={persona.badge} />
              <Pad size={spacings.xs} />
              <View style={{ flexDirection: 'column' }}>
