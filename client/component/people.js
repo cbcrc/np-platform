@@ -150,10 +150,7 @@ export function Byline({type='small', photoType=null, clickable=true, userId, na
         datastore.gotoInstance({structureKey: 'profile', instanceKey: userId});
     }
     if (enableTitledWriterComment && persona.badge && persona.tag) { // titled writer layout
-        if (Comment.titledWriterAnonymousComment)
-            return <View style={s.outer}>anonymous</View>
-        else 
-            return <View style={s.outer}>
+        return <View style={s.outer}>
             <ProfilePhoto userId={userId} photo={photo} type={'large'} badge={persona.badge} />
              <Pad size={spacings.xs} />
              <View style={{ flexDirection: 'column' }}>
