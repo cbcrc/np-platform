@@ -9,18 +9,18 @@ import { TextButton } from "./button";
 import { useLanguage } from "./translation";
 import { useConfig } from "../util/features";
 
-export function ProfilePhoto({userId, type='large', photo=null, faint=false, check=false, border=false, badge=null}) {
+export function ProfilePhoto({userId, type='large', photo=null, faint=false, check=false, border=false}) {
 
     const persona = useObject('persona', userId);
     const isLive = useIsLive();
     const meKey = usePersonaKey();
     if (meKey == userId && isLive) {
-        return <MyProfilePhoto type={type} photo={photo} faint={faint} check={check} border={border} badge={badge} />
+        return <MyProfilePhoto type={type} photo={photo} faint={faint} check={check} border={border} />
     } else {
         const face = persona?.face;
         if (face || photo || persona?.photoUrl) {
             return <FaceImage face={face} photoUrl={photo ?? persona?.photoUrl} type={type} 
-                border={border} faint={faint} check={check} badge={badge}/>
+                border={border} faint={faint} check={check} />
         } else if (persona?.hue && persona?.name) {
             return <LetterFace name={persona.name} hue={persona.hue} type={type} />
         } else {
@@ -41,7 +41,10 @@ export function MyProfilePhoto({type='large', photo=null, faint=false, check=fal
     }
 }
 
-export function FaceImage({face, photoUrl=null, type='small', faint=false, check=false, border=false, badge=null}) {
+export function FaceImage({ face, photoUrl = null, type = 'small', faint = false, check = false, border = false }) {
+    
+    const { badgeUrlByline } = useConfig();
+    
     const sizeMap = {
         huge: 80,
         large: 40,
@@ -66,7 +69,7 @@ export function FaceImage({face, photoUrl=null, type='small', faint=false, check
                 borderColor: 'white'
             }}
             source={{uri: photoUrl ?? ('https://new-public-demo.web.app/faces/' + face)}} />
-            {badge && <View style={{position: 'absolute', right: 0, bottom: 0}}>
+            {badgeUrlByline && <View style={{position: 'absolute', right: 0, bottom: 0}}>
              <Image 
                 style={{
                     width: 14, height: 14, borderRadius: 7,
@@ -74,7 +77,7 @@ export function FaceImage({face, photoUrl=null, type='small', faint=false, check
                     backgroundColor: 'white',
                     borderWidth: 2
                 }}
-                source={{ uri: badge }} />
+                source={{ uri: badgeUrlByline }} />
             </View>}
             {check && <View style={{position: 'absolute', right: 0, bottom: 0}}>
                 <IconCircleCheck />
@@ -100,6 +103,7 @@ export function LetterFace({name, hue, type='large'}) {
         <Text style={[{fontSize: size / 2}, s.letter]}>{letter}</Text>
     </View>    
 }
+
 const LetterFaceStyle = StyleSheet.create({
     letter: {
         color: colorWhite,
@@ -132,6 +136,7 @@ export function FacePile({type='small', userIdList}) {
         </View>)}
     </View>
 }
+
 const FacePileStyle = StyleSheet.create({
     outer: {
         flexDirection: 'row',
@@ -140,7 +145,7 @@ const FacePileStyle = StyleSheet.create({
 
 export function Byline({type='small', photoType=null, clickable=true, userId, name=null, photo=null, time, subtitleLabel, subtitleParams={}, underline=false, edited=false}) {
     
-    const {enableTitledWriterComment} = useConfig();
+    const {enableTitledWriterComment, tagByline} = useConfig();
     const s = BylineStyle;
     const persona = usePersonaObject(userId);
     const language = useLanguage();
@@ -149,35 +154,57 @@ export function Byline({type='small', photoType=null, clickable=true, userId, na
     function onProfile() {
         datastore.gotoInstance({structureKey: 'profile', instanceKey: userId});
     }
-    if (enableTitledWriterComment && persona.badge && persona.tag) { // titled writer layout
-        return <View style={s.outer}>
-            <ProfilePhoto userId={userId} photo={photo} type={'large'} badge={persona.badge} />
-             <Pad size={spacings.xs} />
-             <View style={{ flexDirection: 'column' }}>
-                <View style={{ flexDirection: 'row' }}>
-                    {clickable ?
-                        <TextButton type='small' strong text={name ?? persona?.name}  underline={underline} onPress={onProfile} />
-                    : 
-                        <UtilityText strong text={name ?? persona?.name}  underline={underline} />
-                    }
-                    {time && <Pad size={6} />}
-                    {time &&                     <UtilityText color={colorTextGrey} 
-                                label={'{time}' + (edited ? ' • Edited' : '')} 
-                                formatParams={{time: formatMiniDate(time, language)}} underline={underline}/>
-                    }
+    // if (enableTitledWriterComment && persona.badge && persona.tag) { // titled writer layout
+    //     return <View style={s.outer}>
+    //         <ProfilePhoto userId={userId} photo={photo} type={'large'} badge={persona.badge} />
+    //          <Pad size={spacings.xs} />
+    //          <View style={{ flexDirection: 'column' }}>
+    //             <View style={{ flexDirection: 'row' }}>
+    //                 {clickable ?
+    //                     <TextButton type='small' strong text={name ?? persona?.name}  underline={underline} onPress={onProfile} />
+    //                 : 
+    //                     <UtilityText strong text={name ?? persona?.name}  underline={underline} />
+    //                 }
+    //                 {time && <Pad size={6} />}
+    //                 {time &&                     <UtilityText color={colorTextGrey} 
+    //                             label={'{time}' + (edited ? ' • Edited' : '')} 
+    //                             formatParams={{time: formatMiniDate(time, language)}} underline={underline}/>
+    //                 }
+    //             </View>
+    //             {persona.tag && <View style={s.tag}>
+    //                  <UtilityText label={persona.tag} type='tiny' />
+    //             </View>
+    //             }
+    //     </View>
+    // </View>   
+    // }
+    if (type == 'large') {
+        if (tagByline) {
+            return <View style={s.outer}>
+                    <ProfilePhoto userId={userId} photo={photo} type={'large'}  />
+                    <Pad size={spacings.xs} />
+                    <View style={{ flexDirection: 'column' }}>
+                        <View style={{ flexDirection: 'row' }}>
+                            {clickable ?
+                                <TextButton type='small' strong text={name ?? persona?.name}  underline={underline} onPress={onProfile} />
+                            : 
+                                <UtilityText strong text={name ?? persona?.name}  underline={underline} />
+                            }
+                            {time && <Pad size={6} />}
+                            {time &&                     <UtilityText color={colorTextGrey} 
+                                        label={'{time}' + (edited ? ' • Edited' : '')} 
+                                        formatParams={{time: formatMiniDate(time, language)}} underline={underline}/>
+                            }
+                        </View>
+                        <View style={s.tag}>
+                            <UtilityText label={tagByline} type='tiny' />
+                        </View>
                 </View>
-                {persona.tag && <View style={s.tag}>
-                     <UtilityText label={persona.tag} type='tiny' />
-                </View>
-                }
-        </View>
-    </View>   
-    }
-    else if (type == 'large') {
-        return <View style={s.outer}>
+            </View>   
+        } else {
+         return <View style={s.outer}>
             <ProfilePhoto userId={userId} photo={photo} type={photoType ?? 'large'} /> 
             <View style={s.right}>
-                {/* <UtilityText strong text={name ?? persona?.name} /> */}
                 <TextButton type='small' alignStart text={name ?? persona?.name} strong onPress={onProfile} />
                 <Pad size={2} />
                 {subtitleLabel ? 
@@ -188,7 +215,8 @@ export function Byline({type='small', photoType=null, clickable=true, userId, na
                         formatParams={{time: formatDate(time, language)}} underline={underline}/>
                 }
             </View>
-        </View>
+         </View>
+        }
     }
     else {
         return <View style={s.smallOuter}>
@@ -207,6 +235,76 @@ export function Byline({type='small', photoType=null, clickable=true, userId, na
         </View>
     }
 }
+
+// export function Byline({type='small', photoType=null, clickable=true, userId, name=null, photo=null, time, subtitleLabel, subtitleParams={}, underline=false, edited=false}) {
+    
+//     const {enableTitledWriterComment} = useConfig();
+//     const s = BylineStyle;
+//     const persona = usePersonaObject(userId);
+//     const language = useLanguage();
+//     const datastore = useDatastore();
+
+//     function onProfile() {
+//         datastore.gotoInstance({structureKey: 'profile', instanceKey: userId});
+//     }
+//     if (enableTitledWriterComment && persona.badge && persona.tag) { // titled writer layout
+//         return <View style={s.outer}>
+//             <ProfilePhoto userId={userId} photo={photo} type={'large'} badge={persona.badge} />
+//              <Pad size={spacings.xs} />
+//              <View style={{ flexDirection: 'column' }}>
+//                 <View style={{ flexDirection: 'row' }}>
+//                     {clickable ?
+//                         <TextButton type='small' strong text={name ?? persona?.name}  underline={underline} onPress={onProfile} />
+//                     : 
+//                         <UtilityText strong text={name ?? persona?.name}  underline={underline} />
+//                     }
+//                     {time && <Pad size={6} />}
+//                     {time &&                     <UtilityText color={colorTextGrey} 
+//                                 label={'{time}' + (edited ? ' • Edited' : '')} 
+//                                 formatParams={{time: formatMiniDate(time, language)}} underline={underline}/>
+//                     }
+//                 </View>
+//                 {persona.tag && <View style={s.tag}>
+//                      <UtilityText label={persona.tag} type='tiny' />
+//                 </View>
+//                 }
+//         </View>
+//     </View>   
+//     }
+//     else if (type == 'large') {
+//         return <View style={s.outer}>
+//             <ProfilePhoto userId={userId} photo={photo} type={photoType ?? 'large'} /> 
+//             <View style={s.right}>
+//                 {/* <UtilityText strong text={name ?? persona?.name} /> */}
+//                 <TextButton type='small' alignStart text={name ?? persona?.name} strong onPress={onProfile} />
+//                 <Pad size={2} />
+//                 {subtitleLabel ? 
+//                     <UtilityText color={colorTextGrey} label={subtitleLabel} formatParams={subtitleParams} underline={underline} />
+//                 : 
+//                     <UtilityText color={colorTextGrey} 
+//                         label={'{time}' + (edited ? ' • Edited' : '')} 
+//                         formatParams={{time: formatDate(time, language)}} underline={underline}/>
+//                 }
+//             </View>
+//         </View>
+//     }
+//     else {
+//         return <View style={s.smallOuter}>
+//             <ProfilePhoto userId={userId} photo={photo} type={photoType ?? 'small'} /> 
+//             <Pad size={8} />
+//             {clickable ?
+//                 <TextButton type='small' strong text={name ?? persona?.name} underline={underline} onPress={onProfile} />
+//             : 
+//                 <UtilityText strong text={name ?? persona?.name} underline={underline} />
+//             }
+//             {time && <Pad size={6} />}
+//             {time && <UtilityText color={colorTextGrey} 
+//                         label={'{time}' + (edited ? ' • Edited' : '')} 
+//                         formatParams={{time: formatMiniDate(time, language)}} underline={underline}/>
+//             }
+//         </View>
+//     }
+// }
 
 const BylineStyle = StyleSheet.create({
     outer: {
