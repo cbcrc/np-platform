@@ -14,13 +14,15 @@ export function ProfilePhoto({userId, type='large', photo=null, faint=false, che
     const persona = useObject('persona', userId);
     const isLive = useIsLive();
     const meKey = usePersonaKey();
+    const { badgeUrlByline } = useConfig();
+    const badgeUrl = badgeUrlByline(persona);
     if (meKey == userId && isLive) {
         return <MyProfilePhoto type={type} photo={photo} faint={faint} check={check} border={border} />
     } else {
         const face = persona?.face;
         if (face || photo || persona?.photoUrl) {
-            return <FaceImage face={face} photoUrl={photo ?? persona?.photoUrl} type={type} 
-                border={border} faint={faint} check={check} />
+            return <FaceImage face={face} photoUrl={photo ?? persona?.photoUrl} type={type}
+                border={border} faint={faint} check={check} badgeUrl={badgeUrl} />
         } else if (persona?.hue && persona?.name) {
             return <LetterFace name={persona.name} hue={persona.hue} type={type} />
         } else {
@@ -41,9 +43,9 @@ export function MyProfilePhoto({type='large', photo=null, faint=false, check=fal
     }
 }
 
-export function FaceImage({ face, photoUrl = null, type = 'small', faint = false, check = false, border = false }) {
+export function FaceImage({ face, photoUrl = null, type = 'small', faint = false, check = false, border = false, badgeUrl = "" }) {
     
-    const { badgeUrlByline } = useConfig();
+
     
     const sizeMap = {
         huge: 80,
@@ -69,7 +71,7 @@ export function FaceImage({ face, photoUrl = null, type = 'small', faint = false
                 borderColor: 'white'
             }}
             source={{uri: photoUrl ?? ('https://new-public-demo.web.app/faces/' + face)}} />
-            {badgeUrlByline && <View style={{position: 'absolute', right: 0, bottom: 0}}>
+            {badgeUrl && <View style={{position: 'absolute', right: 0, bottom: 0}}>
              <Image 
                 style={{
                     width: 14, height: 14, borderRadius: 7,
@@ -77,7 +79,7 @@ export function FaceImage({ face, photoUrl = null, type = 'small', faint = false
                     backgroundColor: 'white',
                     borderWidth: 2
                 }}
-                source={{ uri: badgeUrlByline }} />
+                source={{ uri: badgeUrl }} />
             </View>}
             {check && <View style={{position: 'absolute', right: 0, bottom: 0}}>
                 <IconCircleCheck />
@@ -150,7 +152,7 @@ export function Byline({type='small', photoType=null, clickable=true, userId, na
     const persona = usePersonaObject(userId);
     const language = useLanguage();
     const datastore = useDatastore();
-    const tag = tagByline();
+    const tag = tagByline(persona);
     function onProfile() {
         datastore.gotoInstance({structureKey: 'profile', instanceKey: userId});
     }
