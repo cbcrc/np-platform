@@ -11,7 +11,10 @@ export function demoPersonaToFbUser(persona) {
 export const personaA = {
     key: 'a',
     name: 'Alice Adams',
-    photoUrl: faceUrl('face9.jpeg')
+    photoUrl: faceUrl('face9.jpeg'),
+    tag: "journalist",
+    badge: "https://images.radio-canada.ca/q_auto,w_1200/v1/ici-info/perso/logo-papillon-radio-canada.jpg",
+    organization: "CBC/RADIO-CANADA"
 };
 
 export const personaB = {
