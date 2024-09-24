@@ -15,7 +15,7 @@ export function ProfilePhoto({ userId, type = 'large', photo = null, faint = fal
     const isLive = useIsLive();
     const meKey = usePersonaKey();
     const { badgeUrlByline } = useConfig();
-    const badgeUrl = badgeUrlByline(persona);
+    const badgeUrl = (badgeUrlByline && badgeUrlByline(persona)) || null;
     if (meKey == userId && isLive) {
         return <MyProfilePhoto type={type} photo={photo} faint={faint} check={check} border={border} />
     } else {
@@ -58,6 +58,7 @@ export function FaceImage({ face, photoUrl = null, type = 'small', faint = false
         small: 4,
         tiny: 8,
     }
+
     const checkPad = check ? checkPadMap[type ?? 'small'] : 0;
 
     return <View style={{ position: 'relative', alignSelf: 'flex-start' }}>
@@ -150,30 +151,26 @@ export function Byline({ type = 'small', photoType = null, clickable = true, use
     const persona = usePersonaObject(userId);
     const language = useLanguage();
     const datastore = useDatastore();
-    const tag = tagByline(persona);
+    const tag = (tagByline && tagByline(persona)) || null;
     function onProfile() {
         datastore.gotoInstance({ structureKey: 'profile', instanceKey: userId });
     }
             return <View style={s.outer}>
                 <ProfilePhoto userId={userId} photo={photo} type={photoType ?? type} />
-                <View style={s.right}>
-                    {clickable ?
-                                <TextButton type='small' strong text={name ?? persona?.name} underline={underline} onPress={onProfile} />
+                <Pad size={spacings.xs} />
+                <View style={{ flexDirection: 'column' }}>
+                    <View style={(tag) ? {flexDirection: 'row' } : {flexDirection: 'column' } }>
+                                {clickable ?
+                                <><TextButton type='small' strong text={name ?? persona?.name} underline={underline} onPress={onProfile} /></>
                                 :
-                                <UtilityText strong text={name ?? persona?.name} underline={underline} />
-                            }
-                    <Pad size={spacings.xs} />
-                     <View style={{ flexDirection: 'column' }}>
-                        <View style={(tag) ? { flexDirection: 'row' } : { }}>
-                            
-                            {time && <Pad size={6} />}
-                            {time && <UtilityText color={colorTextGrey}
-                                label={'{time}' + (edited ? ' • Edited' : '')}
-                                formatParams={{ time: formatMiniDate(time, language) }} underline={underline} />
-                            }
-                        </View>
+                                <><UtilityText strong text={name ?? persona?.name} underline={underline} /></>
+                        }
+                        {time && <><Pad size={spacings.xs} /><UtilityText color={colorTextGrey}
+                            label={'{time}' + (edited ? ' • Edited' : '')}
+                            formatParams={(type == 'small') ? { time: formatMiniDate(time, language) } : { time: formatDate(time, language) } } underline={underline} /></>
+                        }
+                    </View>
                     {tag}
-                </View>
                 </View>
             </View>
     }
