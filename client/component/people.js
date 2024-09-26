@@ -14,50 +14,48 @@ export function ProfilePhoto({ userId, type = 'large', photo = null, faint = fal
     const persona = useObject('persona', userId);
     const isLive = useIsLive();
     const meKey = usePersonaKey();
-    const { badgeUrlByline } = useConfig();
-    const badgeUrl = (badgeUrlByline && badgeUrlByline(persona)) || null;
+
     if (meKey == userId && isLive) {
         return <MyProfilePhoto type={type} photo={photo} faint={faint} check={check} border={border} />
     } else {
         const face = persona?.face;
         if (face || photo || persona?.photoUrl) {
-            return <FaceImage face={face} photoUrl={photo ?? persona?.photoUrl} type={type}
-                border={border} faint={faint} check={check} badgeUrl={badgeUrl} />
+            return <> 
+                <FaceImage face={face} photoUrl={photo ?? persona?.photoUrl} type={type} border={border} faint={faint} check={check} />
+                {renderLayers(type, persona)}
+            </>
         } else if (persona?.hue && persona?.name) {
             return <LetterFace name={persona.name} hue={persona.hue} type={type} />
         } else {
             return <AnonymousFace faint={faint} type={type} border={border} />
         }
     }
+
 }
 
-export function MyProfilePhoto({ type = 'large', photo = null, faint = false, check = false, border = false }) {
-    const personaPreview = usePersonaPreview();
-    if (personaPreview?.photoUrl) {
-        return <FaceImage photoUrl={photo ?? personaPreview.photoUrl} type={type} faint={faint}
-            border={border} check={check} />
-    } else if (personaPreview?.hue && personaPreview?.name) {
-        return <LetterFace name={personaPreview.name} hue={personaPreview.hue} type={type} />
-    } else {
-        return <AnonymousFace faint={faint} type={type} border={border} />
-    }
+function renderLayers(type, persona) { 
+
+    const { layersByline } = useConfig();
+    const size = sizeMap[type] ?? 32;
+    
+    return <view style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: size,
+                height: size,
+                backgroundColor: 'transparent'
+    }}>
+        {layersByline.map((item,i) => item(persona))}
+    </view>
 }
 
-export function FaceImage({ face, photoUrl = null, type = 'small', faint = false, check = false, border = false, badgeUrl = "" }) {
+export function FaceImage({ face, photoUrl = null, type = 'small', faint = false, check = false, border = false}) {
 
-    const sizeMap = {
-        huge: 80,
-        large: 40,
-        small: 32,
-        tiny: 24,
-    }
+ 
     const size = sizeMap[type] ?? 32;
 
-    const checkPadMap = {
-        large: 2,
-        small: 4,
-        tiny: 8,
-    }
+   
 
     const checkPad = check ? checkPadMap[type ?? 'small'] : 0;
 
@@ -70,16 +68,6 @@ export function FaceImage({ face, photoUrl = null, type = 'small', faint = false
                 borderColor: 'white'
             }}
             source={{ uri: photoUrl ?? ('https://new-public-demo.web.app/faces/' + face) }} />
-        {badgeUrl && <View style={{ position: 'absolute', right: 0, bottom: 0 }}>
-            <Image
-                style={{
-                    width: 14, height: 14, borderRadius: 7,
-                    borderColor: 'white',
-                    backgroundColor: 'white',
-                    borderWidth: 2
-                }}
-                source={{ uri: badgeUrl }} />
-        </View>}
         {check && <View style={{ position: 'absolute', right: 0, bottom: 0 }}>
             <IconCircleCheck />
         </View>}
@@ -152,6 +140,7 @@ export function Byline({ type = 'small', photoType = null, clickable = true, use
     const language = useLanguage();
     const datastore = useDatastore();
     const tag = (tagByline && tagByline(persona)) || null;
+
     function onProfile() {
         datastore.gotoInstance({ structureKey: 'profile', instanceKey: userId });
     }
@@ -218,3 +207,16 @@ const FaceButtonStyle = StyleSheet.create({
         borderRadius: 50
     },
 });
+
+const sizeMap = {
+    huge: 80,
+    large: 40,
+    small: 32,
+    tiny: 24,
+}
+
+ const checkPadMap = {
+        large: 2,
+        small: 4,
+        tiny: 8,
+    }
